@@ -57,6 +57,18 @@ def add_noise(
 
     if speech_power == 0 or noise_power == 0:
         return speech.astype(np.float32) # Silence: nothing sensible to mix
+    
+    target_noise_power = speech_power / (10 ** (snr / 10))
+    scaled_noise = noise * np.sqrt(target_noise_power / noise_power)
+
+    mixed = speech  + scaled_noise
+
+    # keep samples inside [-1, 1]
+    peak = np.max(np.abs(mixed))
+    if peak > 1.0:
+        mixed = mixed / peak
+    return mixed.astype(np.float32)
+    
 
 
 
